@@ -27,7 +27,7 @@ body.intro-on{overflow:hidden}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 [hidden]{display:none!important}
 canvas.layer{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
-#bg{z-index:0}#petals{z-index:1}#fx{z-index:70}
+#bg{z-index:0}#petals{z-index:1}#fx{z-index:70}#sparkle{z-index:71}
 .nebula{position:fixed;inset:-25%;z-index:0;pointer-events:none;filter:blur(80px);opacity:.7}
 .nebula i{position:absolute;border-radius:50%;mix-blend-mode:screen;animation:drift 30s ease-in-out infinite alternate}
 .nebula i:nth-child(1){width:55vmax;height:40vmax;left:0;top:10%;background:radial-gradient(closest-side,rgba(255,122,168,.30),transparent)}
@@ -146,6 +146,20 @@ body.ready .heart-name{opacity:1;transform:none;filter:none}
 .typing i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.7);animation:dot 1s infinite}
 .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
 @keyframes dot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+.chat{position:relative}
+.chat-tip{margin-left:auto;font-size:11px;color:var(--dim);letter-spacing:.1em}
+.chat-scroll{height:min(62svh,600px);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 6px 40px;margin:0 -6px;cursor:grab;
+  scrollbar-width:thin;scrollbar-color:rgba(255,122,168,.45) transparent;
+  -webkit-mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 70px),transparent);mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 70px),transparent)}
+.chat-scroll::-webkit-scrollbar{width:4px}.chat-scroll::-webkit-scrollbar-thumb{background:rgba(255,122,168,.45);border-radius:4px}
+.chat-scroll.grabbing{cursor:grabbing;user-select:none;-webkit-user-select:none}
+.chat-hint{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:7px 16px;border-radius:999px;white-space:nowrap;
+  background:rgba(255,122,168,.18);border:1px solid rgba(255,122,168,.4);color:#fff;font-size:12px;letter-spacing:.12em;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 0 20px rgba(255,122,168,.3);transition:opacity .5s;pointer-events:none}
+.chat-hint b{color:var(--blush)}
+.chat-hint i{width:8px;height:8px;border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(45deg);animation:hint 1.4s infinite}
+@keyframes hint{0%,100%{transform:translateY(-2px) rotate(45deg)}50%{transform:translateY(3px) rotate(45deg)}}
+.chat-hint.hide{opacity:0}
 .chat-end{text-align:center;margin-top:24px;font-size:12px;color:var(--dim);letter-spacing:.2em}
 
 /* ---------- 照片墙 ---------- */
@@ -171,7 +185,7 @@ body.ready .heart-name{opacity:1;transform:none;filter:none}
 
 /* ---------- 结尾 ---------- */
 .finale{text-align:center}
-.finale h2{font-family:var(--serif);font-weight:700;font-size:clamp(40px,10vw,110px);line-height:1.25;letter-spacing:.12em;padding-left:.12em;
+.finale h2{font-family:var(--serif);font-weight:700;font-size:clamp(30px,8.4vw,110px);white-space:nowrap;line-height:1.25;letter-spacing:.12em;padding-left:.12em;
   background:linear-gradient(100deg,var(--ice),#fff 30%,var(--rose) 60%,var(--blue));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 9s linear infinite}
 @keyframes sheen{to{background-position:-300% 0}}
 .finale p{margin-top:24px;font-family:var(--serif);color:var(--muted);font-size:clamp(15px,1.6vw,20px);line-height:2.1;letter-spacing:.12em}
@@ -210,6 +224,7 @@ body.ready .heart-name{opacity:1;transform:none;filter:none}
 <div class="nebula" aria-hidden="true"><i></i><i></i><i></i></div>
 <canvas id="petals" class="layer"></canvas>
 <canvas id="fx" class="layer"></canvas>
+<canvas id="sparkle" class="layer"></canvas>
 
 <div id="intro">
   <canvas id="introCv"></canvas>
@@ -261,11 +276,14 @@ body.ready .heart-name{opacity:1;transform:none;filter:none}
   <section id="chat">
     <p class="eyebrow rv">from our chat history</p>
     <h2 class="h2 rv d1">聊天记录 · 节选</h2>
-    <p class="lead rv d2">婚前那几年，我们一共发了 <em>81,405</em> 条消息。<br>挑了几段能见人的。</p>
+    <p class="lead rv d2">婚前那几年，我们一共发了 <em>81,405</em> 条消息。<br>挑了几十段能见人的，往下滑慢慢看。</p>
     <div class="chat rv d2">
-      <div class="chat-head"><div class="av" id="headAv">君</div><div><b>刘俐君</b><small>2019.09.22 — 2024.03</small></div></div>
-      <div id="chatBody"></div>
-      <p class="chat-end">—— 以下省略 81,000 多条 ——</p>
+      <div class="chat-head"><div class="av" id="headAv">君</div><div><b>刘俐君</b><small id="chatNow">2019年9月22日</small></div><span class="chat-tip">↕ 可以滑动</span></div>
+      <div class="chat-scroll" id="chatScroll">
+        <div id="chatBody"></div>
+        <p class="chat-end">—— 以下省略 81,000 多条 ——</p>
+      </div>
+      <div class="chat-hint" id="chatHint">往下滑 · 一共 <b id="chatCount"></b> 段<i></i></div>
     </div>
   </section>
 
@@ -301,7 +319,7 @@ body.ready .heart-name{opacity:1;transform:none;filter:none}
    ✏️ 可以改的地方都在这里
    ===================================================================== */
 const TOGETHER = new Date(2019, 9, 27, 19, 0, 0);   // 在一起的时间（月份从 0 开始，9 = 十月）
-const MUSIC = 'music/background.mp4';               // 背景音乐
+const MUSIC = 'music/background.mp3';               // 背景音乐
 const AVATAR_HER = '';                              // 她的头像图片，例如 'img/her.jpg'；留空显示「君」
 const AVATAR_ME  = '';                              // 你的头像图片；留空显示「磊」
 
@@ -340,6 +358,24 @@ const CHATS = [
     ['h', '回啦刚练完歌'],
     ['m', '是你独唱吗😏'],
     ['h', '合唱啊傻'] ] },
+  { date: '2019年9月24日 22:36', lines: [
+    ['h', '睡这么晚早上起得来吗'],
+    ['m', '八点多起床踩点上班'],
+    ['m', '能多躺两分钟绝对不翻身'],
+    ['h', '睡不着听什么歌哦 要听这个'],
+    ['m', '怎么这么多人听啊 两亿次'],
+    ['h', '哈哈哈哈你从来没听过吗'] ] },
+  { date: '2019年10月7日 18:30', lines: [
+    ['h', '我在路边等你'],
+    ['h', '在下雨'],
+    ['h', '你带伞没'],
+    ['m', '没有'] ] },
+  { date: '2019年10月16日 22:05', lines: [
+    ['m', '还有狗刨式'],
+    ['m', '是不是也是初学的'],
+    ['h', '狗刨真的很丑诶'],
+    ['h', '但是狗刨不用换气'],
+    ['m', '是吧 我得看看能不能跳过狗刨蛙泳'] ] },
   { date: '2019年10月27日 13:34', lines: [
     ['m', '看电影吗'],
     ['m', '少年的你'],
@@ -353,26 +389,126 @@ const CHATS = [
     ['m', '我感觉我坚持不了涂太多东西'],
     ['h', '那你就看我涂吧'],
     ['m', '看着你精致就好'] ] },
+  { date: '2019年11月3日 19:08', lines: [
+    ['h', '两个人都学一点'],
+    ['h', '起码不会饿死'],
+    ['m', '买菜行吗'],
+    ['h', '我做饭会死人啊'],
+    ['h', '你不怕中毒'],
+    ['m', '不怕 我在旁边看着'],
+    ['m', '加油 刘大厨'] ] },
+  { date: '2019年11月5日 21:07', lines: [
+    ['h', '芒...芒果蛋糕🍰？'],
+    ['h', '嘛呀 谢谢猪猪的蛋糕 太幸福了'] ] },
   { date: '2019年11月18日 19:40', lines: [
     ['h', '你可爱的小皮筋到了'],
     ['m', '给我看看'],
     ['m', '嗯 你掌纹是平行的啊'],
     ['m', '听说命长'],
     ['h', '我说图片里面有你的皮筋'] ] },
+  { date: '2019年11月21日 22:44', lines: [
+    ['m', '你要来不 我报个名'],
+    ['h', '到时候全场都是带着孩子的 我们俩个（黑人问号脸）？？？'],
+    ['m', '肯定不会带孩子听的'],
+    ['m', '我们也不是不像😏'],
+    ['m', '周末不刮胡子留着过去'] ] },
+  { date: '2019年12月6日 20:22', fx: 'hearts', lines: [
+    ['h', '想见你 明天等你下班去找你'],
+    ['m', '好 明天不加班'],
+    ['m', '🤗'] ] },
+  { date: '2019年12月30日 23:17', lines: [
+    ['m', '在打游戏'],
+    ['h', '现在回去第一件事不是找女朋友变打游戏了'],
+    ['h', '再见朋友'],
+    ['m', '明天不是可以找你了'] ] },
+  { date: '2020年1月20日 15:07', lines: [
+    ['h', '你吃饭没'],
+    ['m', '路上买了饭团'],
+    ['h', '辛苦我的小宝贝'] ] },
+  { date: '2020年1月23日 21:05', lines: [
+    ['h', '那你喜欢什么🤔'],
+    ['m', '这个看你今年想变成什么样了'],
+    ['m', '不变也行'],
+    ['h', '我以为你会趁机表白 （我喜欢你）'],
+    ['m', '太普通了'],
+    ['h', '怎么才不普通'],
+    ['m', '这是个好问题'] ] },
+  { date: '2020年1月24日 21:06', lines: [
+    ['m', '说明是时候学做菜了'],
+    ['h', '😂😂见缝插针的水平很高鸭'],
+    ['h', '有个男人费尽心思想让我学做饭'],
+    ['m', '我只是阐述了下实情'] ] },
   { date: '2020年1月25日 00:17', fx: 'stars', lines: [
     ['h', '新年快乐 是更喜欢你的一年🦄🎆'],
     ['m', '🤗 喜欢你的第二年'],
     ['h', '哈哈哈你长大了'] ] },
+  { date: '2020年1月30日 12:49', lines: [
+    ['m', '早'],
+    ['h', '手机一震 知道男朋友醒了'],
+    ['h', '这是情侣头像啊猪猪'] ] },
+  { date: '2020年2月14日 15:35', fx: 'hearts', lines: [
+    ['h', '天..一起床就在忙工作 差点把正事忘了'],
+    ['h', '磊磊情人节快乐鸭❤️'],
+    ['m', '刘老师情人节快乐❤️'] ] },
   { date: '2020年2月16日 20:55', lines: [
     ['h', '等你以后老了，走不动了，我就每天用轮椅推你到广场上去，让你看着我和别的老头跳舞。'],
     ['m', '那我得趁还能走 先跳个够'],
     ['h', '你也可以和其他老头一起跳舞'],
     ['m', '老头太难找了'],
     ['h', '公园里一抓一大把'] ] },
+  { date: '2020年2月18日 凌晨 01:03', lines: [
+    ['h', '睡不着'],
+    ['h', '因为经常熬夜我的肝好像不太好 你可以叫我小心肝吗'],
+    ['h', '我是一只绵羊 今天剪毛了 所以我失绵了'],
+    ['h', '小鸭对小鸡表白“小鸡小鸡，我爱你”\n小鸡对小鸭说“你duck不必”'],
+    ['h', '今天遇见个卖草莓的 他说他的草莓绝对是最甜的东西 我嗤之以鼻 怎么可能有东西比我还甜'],
+    ['h', '我对象说：明天一起过情人节吧\n象说：不行，动物园不让'],
+    ['h', '好吧看来真睡死了晚安'] ] },
   { date: '2020年5月7日 早上', lines: [
     ['h', '早安臭猪 快起来敲代码'] ] },
+  { date: '2020年5月20日 07:34', lines: [
+    ['m', '520给你种棵树怎么样'],
+    ['h', '你起这么早的'] ] },
+  { date: '2020年5月27日 21:33', lines: [
+    ['h', '打游戏就可以不回我消息👊'],
+    ['m', '我发了呀'],
+    ['m', '发错对象了'],
+    ['h', '你找文件助手处对象了吧'],
+    ['m', '😏'] ] },
+  { date: '2020年7月23日 18:18', lines: [
+    ['h', '你长的好看'],
+    ['h', '说什么都对'],
+    ['h', '不过我更羡慕你'],
+    ['m', '羡慕我的什么'],
+    ['h', '拥有那么美丽可爱善良迷人的女朋友'] ] },
+  { date: '2020年7月26日 22:18', lines: [
+    ['h', '申请需要么么哒'],
+    ['h', '借会员需要撒娇或者卖萌'],
+    ['h', '女朋友开心就一切免单'],
+    ['m', '好难啊'],
+    ['m', '可以换个条件吗'],
+    ['h', '暂时没开通此项服务'] ] },
+  { date: '2020年9月18日 00:14', lines: [
+    ['h', '难道不是照你“帅气”的脸？'],
+    ['m', '不是'],
+    ['m', '我已经习惯了自己的帅气'],
+    ['h', '好了洗洗睡吧'] ] },
   { date: '2020年9月26日 13:44', lines: [
     ['h', '睡着了傻瓜 我挂了突然想起怕你外卖打不进来电话'] ] },
+  { date: '2020年9月29日 20:05', lines: [
+    ['m', '看我是花了多大精力找了你这么久'],
+    ['h', '哈？'],
+    ['h', '我怎么感觉你没花啥精力'],
+    ['m', '九点下班还陪你聊天'],
+    ['h', '😂😂😂好像是哦'] ] },
+  { date: '2020年9月30日 15:13', lines: [
+    ['m', '能早一天见到你就早一天'],
+    ['h', '那你来吧'] ] },
+  { date: '2020年10月24日 11:26', fx: 'stars', lines: [
+    ['h', '今天你过节呀'],
+    ['h', '程序员日'],
+    ['h', '1024'],
+    ['h', '节日快乐呀大宝贝'] ] },
   { date: '2020年11月19日 19:08', fx: 'stars', lines: [
     ['m', '然后就不小心发现月亮好亮'],
     ['m', '然后就想到你了'],
@@ -380,16 +516,58 @@ const CHATS = [
     ['m', '一点都不亚洲'],
     ['h', '能不能不要这么含蓄'],
     ['h', '爱就大声说'] ] },
+  { date: '2020年12月12日 13:15', lines: [
+    ['h', '到了也不和我说一声'],
+    ['m', '跟你说了'],
+    ['m', '下车就跟你聊天了'],
+    ['h', '我都没看见“我到家了”字样🍉'] ] },
+  { date: '2020年12月24日 20:38', lines: [
+    ['h', '你也很年轻呀'],
+    ['m', '年轻对我不重要'],
+    ['h', '什么重要'],
+    ['m', '每个阶段都帅的有特色'],
+    ['h', '滚粗'] ] },
+  { date: '2021年1月18日 20:58', lines: [
+    ['h', '你喜欢哪个头？'],
+    ['h', '你怪丑的'],
+    ['h', '和我配在一起🐶'],
+    ['h', '一看就是玩泥巴长大的'] ] },
+  { date: '2021年1月20日 19:57', lines: [
+    ['h', '我感觉你要看不惯我了'],
+    ['h', '🐶为什么不理我了'],
+    ['m', '我只想默默看着你能花里胡哨到什么程度'] ] },
   { date: '2021年2月22日 00:15', lines: [
     ['h', '以后嫁给你，能在家睡懒觉吗？肥肉能挑出来不吃吗？能不做饭吗？能剩饭吗？能不洗碗吗？'],
     ['m', '想得美'] ] },
+  { date: '2021年3月28日 22:25', lines: [
+    ['h', '今天好多人夸你女朋友漂亮'],
+    ['h', '就是没听见你夸'],
+    ['m', '等下'] ] },
   { date: '2021年6月12日 16:43', lines: [
     ['h', '就算世界与我为敌我超喜欢你'],
     ['m', '女人的嘴'] ] },
+  { date: '2021年6月15日 20:25', lines: [
+    ['h', '你想把我养胖'],
+    ['h', '然后就没人要了吗'],
+    ['m', '不 这规律对你不适用'],
+    ['m', '你胖点更好看'],
+    ['h', '🤦🤦🤦'] ] },
   { date: '2021年9月10日 18:58', fx: 'stars', lines: [
     ['h', '今天月亮旁有一颗很亮的星'],
     ['m', '看到了 拍的不错'],
     ['h', '就像我一直陪伴你☺️'] ] },
+  { date: '2021年10月8日 15:42', lines: [
+    ['h', '那岂不是明天晚上就能见到你了'],
+    ['m', '是吧'],
+    ['h', '那你也太幸福了'] ] },
+  { date: '2021年10月26日 19:35', fx: 'hearts', lines: [
+    ['h', '你是不是给我定了个蛋糕？'],
+    ['m', '是啊'],
+    ['h', '今天才26号明天才是二年纪念日'],
+    ['m', '先吃着吧'],
+    ['m', '花不实用'],
+    ['h', '但是花好看我喜欢'],
+    ['h', '花（浪漫）和蛋糕（实用）我都想要'] ] },
   { date: '2021年10月29日 07:32', lines: [
     ['h', '做梦做梦我俩欠了一个亿'],
     ['h', '为了躲债两个人还被人追杀'],
@@ -400,10 +578,46 @@ const CHATS = [
     ['h', '晚安（永别）'],
     ['m', '还生气了'],
     ['h', '谁会和一只pig猪置气呢'] ] },
+  { date: '2021年12月16日 22:31', lines: [
+    ['h', '我好美'],
+    ['m', '这谁啊'],
+    ['h', '你女朋友'],
+    ['m', '不像啊'],
+    ['m', '我女朋友是圆脸'],
+    ['h', '昨天穿新裙子拍的'],
+    ['h', '一整个气质美女'],
+    ['m', '图片挺好看的'],
+    ['h', '夸我好看会不活吗'] ] },
+  { date: '2022年1月10日 凌晨 02:40', lines: [
+    ['m', '挺好了吧 我都已经这么喜欢你了'],
+    ['h', '可能女孩子多多少少都希望有一份专属于自己的浪漫和偏爱吧'],
+    ['m', '你没感受到吗 偏爱'],
+    ['h', '生活的乐趣在于平淡中的惊喜'],
+    ['m', '你已经占了我大部分聊天时间 超过所有其他人总和了'] ] },
+  { date: '2022年1月10日 19:25', lines: [
+    ['h', '宝宝 买了新年礼物给你'],
+    ['h', '过两天估计就到了'],
+    ['h', '记得去拿'],
+    ['m', '好'],
+    ['m', '衣服吗'] ] },
   { date: '2022年1月31日 除夕 19:31', fx: 'fireworks', lines: [
     ['h', '新年快乐🎆祝你在新的一年越来越爱我 越来越疼爱我'],
     ['h', '请你看烟花'],
     ['m', '收到'] ] },
+  { date: '2022年2月8日 22:48', lines: [
+    ['h', '这首歌挺适合婚礼当天男生给女生唱的'],
+    ['h', '怎么才周二就想见我了吗'] ] },
+  { date: '2022年7月8日 19:21', lines: [
+    ['h', '你别想白嫖我'],
+    ['h', '要吃饭一起去买菜'],
+    ['h', '我做饭你洗碗'],
+    ['h', '要不然免谈'] ] },
+  { date: '2023年8月11日 23:02', fx: 'fireworks', lines: [
+    ['h', '我们俩长得好像😂'],
+    ['m', '是有点'],
+    ['h', '谁比较漂亮'],
+    ['m', '差不多'],
+    ['h', '😓再给你一次机会'] ] },
 ];
 
 /* ===================================================================== */
@@ -537,58 +751,82 @@ const CHATS = [
   }
 
   /* =================================================================
-     3D 粒子爱心（带星环），可拖动旋转、点击心跳
+     3D 粒子爱心：真正的三维心形曲面 + 星环 + 上升的光尘
      ================================================================= */
   const hcv = $('#heart3d'), stage = $('#heartStage');
-  let hctx, HW, HH, hp = [], rotY = 0, rotX = -.18, velY = .006, dragging = false, kick = 0, heartVisible = true;
+  let hctx, HW, HH, hp = [], embers = [], rotY = 0, rotX = -.15, velY = .006, dragging = false, kick = 0, heartVisible = true;
+  // 心形隐函数（z 轴朝上）：(x²+9/4·y²+z²-1)³ - x²z³ - 9/80·y²z³ = 0
+  const heartF = (x, y, z) => { const a = x * x + 2.25 * y * y + z * z - 1; return a * a * a - x * x * z * z * z - .1125 * y * y * z * z * z; };
+  function surfacePoint() {
+    // 从中心随机方向发射，二分法找到曲面
+    let dx, dy, dz, l;
+    do { dx = rand(-1, 1); dy = rand(-1, 1); dz = rand(-1, 1); l = Math.hypot(dx, dy, dz); } while (l > 1 || l < .05);
+    dx /= l; dy /= l; dz /= l;
+    let lo = 0, hi = 1.6;
+    for (let i = 0; i < 22; i++) { const m = (lo + hi) / 2; if (heartF(dx * m, dy * m, dz * m) < 0) lo = m; else hi = m; }
+    return [dx * lo, dy * lo, dz * lo];
+  }
+  // 心形粒子用柔和的彩色光点（没有白色高光核心，叠加时不会出现刺眼的白条）
+  const softSprites = PALETTE.map((c) => {
+    const s = document.createElement('canvas'); s.width = s.height = 32;
+    const g = s.getContext('2d'), gr = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+    gr.addColorStop(0, `rgba(${c},.95)`); gr.addColorStop(.3, `rgba(${c},.45)`); gr.addColorStop(1, `rgba(${c},0)`);
+    g.fillStyle = gr; g.fillRect(0, 0, 32, 32); return s;
+  });
   function initHeart() {
     HW = stage.clientWidth; HH = stage.clientHeight; hctx = fit(hcv, HW, HH);
-    const N = W < 600 ? 2200 : 4200;
+    const N = W < 600 ? 2600 : 4600;
     const old = hp; hp = [];
     for (let i = 0; i < N; i++) {
       let x, y, z, kind;
-      const r0 = Math.random();
-      if (r0 < .72) { // 爱心表面（鼓起的抱枕形状）
-        const t = rand(0, Math.PI * 2), r = Math.sqrt(Math.random()), [hx, hy] = heartXY(t);
-        x = hx * r; y = hy * r + 2; z = (Math.random() < .5 ? -1 : 1) * 7.5 * Math.sqrt(1 - r * r) + rand(-.3, .3); kind = 0;
-      } else if (r0 < .82) { // 外轮廓
-        const t = rand(0, Math.PI * 2), [hx, hy] = heartXY(t); x = hx * 1.02; y = hy * 1.02 + 2; z = rand(-.8, .8); kind = 0;
-      } else { // 星环
+      if (i < N * .8) {
+        const [sx, sy, sz] = surfacePoint();
+        const inset = Math.random() < .12 ? rand(.55, .92) : 1; // 少量粒子在内部，让心看起来有体积
+        x = sx * 14 * inset; y = -sz * 14 * inset + 1.5; z = sy * 14 * inset; kind = 0;
+      } else {
         const a = rand(0, Math.PI * 2), R = rand(22, 29); x = Math.cos(a) * R; z = Math.sin(a) * R; y = rand(-.6, .6); kind = 1;
       }
       const p = old[i] || { sx: rand(-60, 60), sy: rand(-60, 60), sz: rand(-60, 60) };
-      const yn = (y + 17) / 30; // 0 顶部 → 1 底部
-      const col = kind === 1 ? 4 + Math.floor(Math.random() * 3) : Math.min(6, Math.max(0, Math.floor(yn * 3 + rand(0, 3))));
+      const yn = Math.max(0, Math.min(1, (y + 16) / 30));
+      const col = kind === 1 ? 4 + Math.floor(Math.random() * 3) : Math.min(5, Math.max(0, Math.floor(yn * 2.6 + rand(0, 2.6))));
       hp.push({ x, y, z, kind, a: kind === 1 ? Math.atan2(z, x) : 0, R: kind === 1 ? Math.hypot(x, z) : 0, sp: kind === 1 ? rand(.6, 1.2) : 0,
-        sx: p.sx, sy: p.sy, sz: p.sz, col, size: kind === 1 ? rand(1.4, 3) : rand(1.8, 4.2), tw: rand(0, 6.28) });
+        sx: p.sx, sy: p.sy, sz: p.sz, col, size: kind === 1 ? rand(1.2, 2.6) : rand(2, 4), tw: rand(0, 6.28) });
     }
+    embers = [];
   }
   function beat(t) {
     const p = (t / 1000 % 1.2) / 1.2;
-    return 1 + .06 * Math.exp(-(((p - .05) / .045) ** 2)) + .04 * Math.exp(-(((p - .24) / .05) ** 2)) + kick;
+    return 1 + .055 * Math.exp(-(((p - .05) / .045) ** 2)) + .035 * Math.exp(-(((p - .24) / .05) ** 2)) + kick;
   }
   function drawHeart(t) {
     if (!heartVisible) return;
     hctx.clearRect(0, 0, HW, HH);
     if (!ready()) return;
-    if (!dragging) { rotY += velY; velY += (.006 - velY) * .02; rotX += (-.18 - rotX) * .02; }
+    if (!dragging) { rotY += velY; velY += (.006 - velY) * .02; rotX += (-.15 - rotX) * .02; }
     kick *= .9;
     const b = beat(t), scale = Math.min(HW / 62, HH / 40), cx = HW / 2, cy = HH / 2, f = 90;
     const cyR = Math.cos(rotY), syR = Math.sin(rotY), cxR = Math.cos(rotX), sxR = Math.sin(rotX);
-    const ringTilt = 1.15, cT = Math.cos(ringTilt), sT = Math.sin(ringTilt);
+    const cT = Math.cos(1.15), sT = Math.sin(1.15);
+    const sizeK = scale / 7.5;
     hctx.globalCompositeOperation = 'lighter';
     for (const p of hp) {
       let x, y, z;
       if (p.kind === 1) { const a = p.a + t * .00025 * p.sp; x = Math.cos(a) * p.R; const z0 = Math.sin(a) * p.R; y = p.y * cT - z0 * sT; z = p.y * sT + z0 * cT; }
       else { x = p.x * b; y = p.y * b; z = p.z * b; }
-      // 从散开状态收拢
       p.sx += (x - p.sx) * .05; p.sy += (y - p.sy) * .05; p.sz += (z - p.sz) * .05;
-      let X = p.sx * cyR + p.sz * syR, Z = -p.sx * syR + p.sz * cyR, Y = p.sy * cxR - Z * sxR; Z = p.sy * sxR + Z * cxR;
+      let X = p.sx * cyR + p.sz * syR, Z = -p.sx * syR + p.sz * cyR; const Y = p.sy * cxR - Z * sxR; Z = p.sy * sxR + Z * cxR;
       const k = f / (f + Z), px = cx + X * scale * k, py = cy + Y * scale * k;
-      const depth = Math.max(.3, Math.min(1, .62 - Z / 50));
-      const s = p.size * k * (scale / 7.5);
-      hctx.globalAlpha = depth * (.65 + .35 * Math.sin(p.tw + t * .003));
-      hctx.drawImage(sprites[p.col], px - s, py - s, s * 2, s * 2);
+      const depth = Math.max(.18, Math.min(1, .6 - Z / 40));
+      const s = p.size * k * sizeK;
+      hctx.globalAlpha = depth * (p.kind ? .9 : .85) * (.75 + .25 * Math.sin(p.tw + t * .003));
+      hctx.drawImage(p.kind ? sprites[p.col] : softSprites[p.col], px - s, py - s, s * 2, s * 2);
+      // 偶尔从心的表面飘起一颗光尘
+      if (!p.kind && Math.random() < .0009 && embers.length < 90) embers.push({ x: px, y: py, vx: rand(-.3, .3), vy: rand(-1.2, -.4), life: 1, col: p.col, s: rand(1.5, 3) * sizeK * 1.4 });
+    }
+    for (let i = embers.length - 1; i >= 0; i--) {
+      const e = embers[i]; e.x += e.vx; e.y += e.vy; e.life -= .012;
+      if (e.life <= 0) { embers.splice(i, 1); continue; }
+      hctx.globalAlpha = e.life; hctx.drawImage(sprites[e.col], e.x - e.s, e.y - e.s, e.s * 2, e.s * 2);
     }
     hctx.globalAlpha = 1; hctx.globalCompositeOperation = 'source-over';
   }
@@ -601,42 +839,73 @@ const CHATS = [
     if (drag.moved) { velY = dx * .006; rotY += velY; rotX = Math.max(-1, Math.min(.6, rotX - dy * .005)); }
     drag.lx = e.clientX; drag.ly = e.clientY;
   });
-  addEventListener('pointerup', (e) => {
+  addEventListener('pointerup', () => {
     if (!drag) return;
-    if (!drag.moved && ready()) { kick = .22; const r = hcv.getBoundingClientRect(); burstAt(r.left + r.width / 2, r.top + r.height / 2, 40, true); }
+    if (!drag.moved && ready()) { kick = .2; const r = hcv.getBoundingClientRect(); shell(r.left + r.width / 2, r.top + r.height / 2, 'heart', .7); }
     drag = null; dragging = false;
   });
 
   /* =================================================================
-     特效层：烟花 / 爱心烟花 / 星星雨 / 光标星尘
+     烟花引擎：带拖尾的真实烟花
+     类型：牡丹(peony) / 菊花(chrys) / 金柳(willow) / 光环(ring) / 爱心(heart) / 双层(double) / 分裂(crossette)
      ================================================================= */
   const fx = $('#fx'); let fctx;
-  const rockets = [], sparks = [], dust = [];
-  const HUES = [340, 330, 350, 210, 220, 265, 195];
-  function launch(x, y, heart) {
+  const rockets = [], parts = [], dust = [], flashes = [];
+  const FW = { pink: '255,110,170', rose: '255,70,130', blush: '255,190,215', ice: '190,230,255', blue: '110,160,255', violet: '180,140,255', gold: '255,205,120', white: '255,255,255' };
+  const fwSprite = {};
+  for (const [k, c] of Object.entries(FW)) {
+    const s = document.createElement('canvas'); s.width = s.height = 32;
+    const g = s.getContext('2d'), gr = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.15, `rgba(${c},1)`); gr.addColorStop(.4, `rgba(${c},.35)`); gr.addColorStop(1, `rgba(${c},0)`);
+    g.fillStyle = gr; g.fillRect(0, 0, 32, 32); fwSprite[k] = s;
+  }
+  // 按弧长均匀取点的心形曲线（避免点堆在尖角处形成亮线）
+  const HEART_CURVE = (() => { const raw = []; for (let i = 0; i <= 2000; i++) raw.push(heartXY(i / 2000 * Math.PI * 2)); const L = [0]; for (let i = 1; i < raw.length; i++) L.push(L[i - 1] + Math.hypot(raw[i][0] - raw[i - 1][0], raw[i][1] - raw[i - 1][1])); return { raw, L, total: L[L.length - 1] }; })();
+  function heartAt(u) { const target = u * HEART_CURVE.total, L = HEART_CURVE.L; let lo = 0, hi = L.length - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (L[m] < target) lo = m; else hi = m; } return HEART_CURVE.raw[lo]; }
+  const COMBOS = [['pink', 'blush'], ['rose', 'gold'], ['blue', 'ice'], ['violet', 'pink'], ['ice', 'blue'], ['gold', 'rose'], ['pink', 'blue'], ['blush', 'violet']];
+  const TYPES = ['peony', 'chrys', 'willow', 'ring', 'heart', 'double', 'crossette', 'peony', 'chrys'];
+  const mobileK = () => (W < 600 ? .6 : 1);
+  const pick = (a) => a[Math.floor(Math.random() * a.length)];
+
+  function launch(x, y, type) {
     x = x ?? rand(W * .15, W * .85);
-    rockets.push({ x, y: H + 10, tx: x + rand(-40, 40), ty: y ?? rand(H * .12, H * .42), hue: HUES[Math.floor(Math.random() * HUES.length)], heart: heart ?? Math.random() < .35, t: 0 });
+    const ty = y ?? rand(H * .14, H * .4);
+    const vy = -Math.sqrt(2 * .09 * (H + 10 - ty)); // 刚好在 ty 处到达顶点
+    rockets.push({ x, y: H + 10, vx: rand(-.6, .6), vy, type: type || pick(TYPES), combo: pick(COMBOS) });
   }
-  function explode(x, y, hue, heart) {
-    const n = isTouch ? 80 : 130, big = Math.min(W, H) / 900;
+  function addPart(o) { parts.push(Object.assign({ drag: .985, g: .035, life: 1, decay: .012, size: 2.2, glitter: false, trail: false, split: false, crackle: false }, o)); }
+  function sphere(n, speed, cb) {
     for (let i = 0; i < n; i++) {
-      let vx, vy;
-      if (heart) { const [hx, hy] = heartXY(i / n * Math.PI * 2); vx = hx * .28 * (1 + big); vy = hy * .28 * (1 + big); }
-      else { const a = rand(0, Math.PI * 2), v = rand(1.5, 6.5) * (1 + big); vx = Math.cos(a) * v; vy = Math.sin(a) * v; }
-      sparks.push({ x, y, vx, vy, life: 1, decay: rand(.010, .017), hue: hue + rand(-12, 12), w: rand(1.2, 2.4), glitter: Math.random() < .3 });
-    }
-    // 第二层：内圈另一种颜色
-    const hue2 = hue > 300 ? 210 : 335;
-    for (let i = 0; i < n / 3; i++) { const a = rand(0, 6.28), v = rand(.5, 2.5) * (1 + big); sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, decay: rand(.015, .025), hue: hue2, w: 1.4, glitter: true }); }
-    sparks.push({ x, y, vx: 0, vy: 0, life: 1, decay: .06, hue, w: 0, flash: true });
-  }
-  function burstAt(x, y, n = 18, heart = false) {
-    for (let i = 0; i < n; i++) {
-      let vx, vy;
-      if (heart) { const [hx, hy] = heartXY(i / n * 6.283); vx = hx * .22; vy = hy * .22; } else { const a = rand(0, 6.28), v = rand(1, 4.5); vx = Math.cos(a) * v; vy = Math.sin(a) * v - 1; }
-      sparks.push({ x, y, vx, vy, life: 1, decay: rand(.02, .035), hue: HUES[i % HUES.length], w: rand(1, 2), glitter: true });
+      const u = rand(-1, 1), th = rand(0, Math.PI * 2), r = Math.sqrt(1 - u * u); // 3D 球面均匀分布 → 投影后边缘更密，像真烟花
+      const s = speed * rand(.92, 1.06);
+      cb(Math.cos(th) * r * s, Math.sin(th) * r * s, i);
     }
   }
+  function shell(x, y, type, scale = 1) {
+    const [c1, c2] = pick(COMBOS), mk = mobileK(), S = Math.min(W, H) / 700 * scale;
+    flashes.push({ x, y, life: 1, c: FW[c1], r: 160 * S + 60 });
+    if (type === 'peony') {
+      sphere(Math.round(150 * mk), 5.2 * S + 1.5, (vx, vy) => addPart({ x, y, vx, vy, c: c1, c2, decay: rand(.011, .016), crackle: Math.random() < .25 }));
+    } else if (type === 'chrys') {
+      sphere(Math.round(120 * mk), 6 * S + 1.5, (vx, vy) => addPart({ x, y, vx, vy, c: c1, c2, decay: rand(.008, .011), trail: true, glitter: true, size: 1.8 }));
+    } else if (type === 'willow') {
+      sphere(Math.round(110 * mk), 4.2 * S + 1.2, (vx, vy) => addPart({ x, y, vx, vy, c: 'gold', c2: 'gold', drag: .965, g: .028, decay: rand(.0055, .0075), trail: true, size: 1.6, glitter: true }));
+    } else if (type === 'ring') {
+      const tilt = rand(.2, 1), rot = rand(0, Math.PI), n = Math.round(90 * mk), sp = 5 * S + 1.4;
+      for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, px = Math.cos(a), py = Math.sin(a) * tilt; addPart({ x, y, vx: (px * Math.cos(rot) - py * Math.sin(rot)) * sp, vy: (px * Math.sin(rot) + py * Math.cos(rot)) * sp, c: c1, c2, decay: .012 }); }
+      sphere(Math.round(50 * mk), 2 * S + .6, (vx, vy) => addPart({ x, y, vx, vy, c: c2, c2: 'white', decay: .02, size: 1.6, glitter: true }));
+    } else if (type === 'heart') {
+      const n = Math.round(110 * mk), sp = .3 * S + .1;
+      for (let i = 0; i < n; i++) { const [hx, hy] = heartAt(i / n); addPart({ x, y, vx: hx * sp, vy: (hy + 2) * sp, c: 'pink', c2: 'rose', g: .018, decay: .011, size: 2.4 }); }
+      for (let i = 0; i < n / 2; i++) { const [hx, hy] = heartAt(Math.random()); const r = rand(.2, .75); addPart({ x, y, vx: hx * sp * r, vy: hy * sp * r, c: 'blush', c2: 'white', g: .018, decay: .016, size: 1.6, glitter: true }); }
+    } else if (type === 'double') {
+      sphere(Math.round(110 * mk), 6 * S + 1.6, (vx, vy) => addPart({ x, y, vx, vy, c: c1, c2: c1, decay: .012 }));
+      sphere(Math.round(70 * mk), 3 * S + .8, (vx, vy) => addPart({ x, y, vx, vy, c: c2, c2: 'white', decay: .015, glitter: true }));
+    } else if (type === 'crossette') {
+      sphere(Math.round(22 * mk + 6), 4.6 * S + 1.4, (vx, vy) => addPart({ x, y, vx, vy, c: c1, c2, decay: .01, split: true, size: 2.8, trail: true }));
+    }
+  }
+  function burstAt(x, y) { shell(x, y, pick(['peony', 'ring', 'heart', 'double']), .45); }
   function starRain(n = 40) {
     for (let i = 0; i < n; i++) setTimeout(() => dust.push({ x: rand(0, W), y: rand(-20, H * .3), vx: rand(-1, 1), vy: rand(1.5, 3.5), life: 1.6, s: rand(4, 9), hue: Math.random() < .5 ? 335 : 210, slow: true }), i * 40);
   }
@@ -644,39 +913,65 @@ const CHATS = [
     for (let i = 0; i < n; i++) setTimeout(() => dust.push({ x: rand(W * .1, W * .9), y: H + 20, vx: rand(-.5, .5), vy: rand(-3.5, -1.8), life: 1.8, s: rand(8, 16), hue: rand(330, 350), heart: true, slow: true }), i * 60);
   }
   function drawFx() {
-    fctx.clearRect(0, 0, W, H);
+    // 不完全清空，而是逐帧淡出，形成烟花拖尾
+    fctx.globalCompositeOperation = 'destination-out';
+    fctx.fillStyle = 'rgba(0,0,0,.2)';
+    fctx.fillRect(0, 0, W, H);
     fctx.globalCompositeOperation = 'lighter';
+
     for (let i = rockets.length - 1; i >= 0; i--) {
-      const r = rockets[i]; r.t++;
-      const ny = r.y + (r.ty - r.y) * .055, nx = r.x + (r.tx - r.x) * .05;
-      fctx.strokeStyle = `hsla(${r.hue},100%,78%,.9)`; fctx.lineWidth = 2; fctx.beginPath(); fctx.moveTo(r.x, r.y + 18); fctx.lineTo(nx, ny); fctx.stroke();
-      r.x = nx; r.y = ny;
-      if (Math.abs(r.y - r.ty) < 6 || r.t > 120) { explode(r.x, r.y, r.hue, r.heart); rockets.splice(i, 1); }
+      const r = rockets[i];
+      r.x += r.vx; r.y += r.vy; r.vy += .09;
+      fctx.drawImage(fwSprite.gold, r.x - 4, r.y - 4, 8, 8);
+      if (Math.random() < .8) addPart({ x: r.x, y: r.y + 4, vx: rand(-.5, .5), vy: rand(.5, 1.5), c: 'gold', c2: 'rose', decay: rand(.04, .07), size: 1.2, g: .02 });
+      if (r.vy >= -.3) { shell(r.x, r.y, r.type); rockets.splice(i, 1); }
     }
-    for (let i = sparks.length - 1; i >= 0; i--) {
-      const p = sparks[i];
-      if (p.flash) {
-        const g = fctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 100 * p.life);
-        g.addColorStop(0, `hsla(${p.hue},100%,85%,${.5 * p.life})`); g.addColorStop(1, 'transparent'); fctx.fillStyle = g; fctx.fillRect(p.x - 110, p.y - 110, 220, 220);
-      } else {
-        p.vx *= .975; p.vy = p.vy * .975 + .045; p.x += p.vx; p.y += p.vy;
-        const a = p.life * (p.glitter && Math.random() < .3 ? .2 : 1);
-        fctx.strokeStyle = `hsla(${p.hue},100%,${62 + p.life * 20}%,${a})`; fctx.lineWidth = p.w * p.life + .3;
-        fctx.beginPath(); fctx.moveTo(p.x - p.vx * 3, p.y - p.vy * 3); fctx.lineTo(p.x, p.y); fctx.stroke();
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.vx *= p.drag; p.vy = p.vy * p.drag + p.g; p.x += p.vx; p.y += p.vy; p.life -= p.decay;
+      if (p.split && p.life < .55) { // 分裂烟花：半路一分为四
+        p.split = false;
+        for (let k = 0; k < 4; k++) { const a = k * Math.PI / 2 + rand(-.3, .3); addPart({ x: p.x, y: p.y, vx: Math.cos(a) * 2.6, vy: Math.sin(a) * 2.6, c: p.c2, c2: 'white', decay: .025, size: 1.6, glitter: true }); }
+        parts.splice(i, 1); continue;
       }
-      p.life -= p.decay; if (p.life <= 0) sparks.splice(i, 1);
+      if (p.life <= 0) {
+        if (p.crackle) for (let k = 0; k < 3; k++) addPart({ x: p.x, y: p.y, vx: rand(-1.4, 1.4), vy: rand(-1.4, 1.4), c: 'white', c2: 'white', decay: .09, size: 1.2 });
+        parts.splice(i, 1); continue;
+      }
+      if (p.trail && Math.random() < .35) addPart({ x: p.x, y: p.y, vx: 0, vy: 0, c: p.c, c2: p.c, decay: .05, size: p.size * .5, g: .01 });
+      if (p.glitter && Math.random() < .25) continue; // 闪烁
+      const col = p.life < .55 ? p.c2 : p.c;
+      const s = p.size * (.5 + p.life * .7) * 2.4;
+      fctx.globalAlpha = Math.min(1, p.life * 1.4);
+      fctx.drawImage(fwSprite[col], p.x - s, p.y - s, s * 2, s * 2);
     }
+    for (let i = flashes.length - 1; i >= 0; i--) {
+      const f = flashes[i];
+      const g = fctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r);
+      g.addColorStop(0, `rgba(${f.c},${.28 * f.life})`); g.addColorStop(1, `rgba(${f.c},0)`);
+      fctx.globalAlpha = 1; fctx.fillStyle = g; fctx.fillRect(f.x - f.r, f.y - f.r, f.r * 2, f.r * 2);
+      f.life -= .08; if (f.life <= 0) flashes.splice(i, 1);
+    }
+    fctx.globalAlpha = 1; fctx.globalCompositeOperation = 'source-over';
+  }
+  const scv = $('#sparkle'); let sctx;
+  function drawDust() {
+    sctx.clearRect(0, 0, W, H);
+    sctx.globalCompositeOperation = 'lighter';
     for (let i = dust.length - 1; i >= 0; i--) {
-      const d = dust[i]; d.x += d.vx; d.y += d.vy; if (!d.slow) d.vy += .02; d.life -= d.slow ? .008 : .025;
+      const d = dust[i]; d.x += d.vx; d.y += d.vy; if (!d.slow) d.vy += .02; d.life -= d.slow ? .008 : .03;
       if (d.life <= 0 || d.y > H + 40 || d.y < -60) { dust.splice(i, 1); continue; }
-      const s = d.s * Math.min(1, d.life), a = Math.min(1, d.life);
-      fctx.fillStyle = `hsla(${d.hue},100%,80%,${a})`;
-      fctx.beginPath();
-      if (d.heart) { fctx.moveTo(d.x, d.y + s * .3); fctx.bezierCurveTo(d.x, d.y, d.x - s * .5, d.y, d.x - s * .5, d.y + s * .3); fctx.bezierCurveTo(d.x - s * .5, d.y + s * .6, d.x, d.y + s * .8, d.x, d.y + s); fctx.bezierCurveTo(d.x, d.y + s * .8, d.x + s * .5, d.y + s * .6, d.x + s * .5, d.y + s * .3); fctx.bezierCurveTo(d.x + s * .5, d.y, d.x, d.y, d.x, d.y + s * .3); }
-      else { fctx.moveTo(d.x, d.y - s); fctx.lineTo(d.x + s * .28, d.y - s * .28); fctx.lineTo(d.x + s, d.y); fctx.lineTo(d.x + s * .28, d.y + s * .28); fctx.lineTo(d.x, d.y + s); fctx.lineTo(d.x - s * .28, d.y + s * .28); fctx.lineTo(d.x - s, d.y); fctx.lineTo(d.x - s * .28, d.y - s * .28); }
-      fctx.fill();
+      const s = d.s * Math.min(1, d.life);
+      sctx.globalAlpha = 1; sctx.fillStyle = `hsla(${d.hue},100%,80%,${Math.min(1, d.life)})`;
+      sctx.beginPath();
+      if (d.heart) { sctx.moveTo(d.x, d.y + s * .3); sctx.bezierCurveTo(d.x, d.y, d.x - s * .5, d.y, d.x - s * .5, d.y + s * .3); sctx.bezierCurveTo(d.x - s * .5, d.y + s * .6, d.x, d.y + s * .8, d.x, d.y + s); sctx.bezierCurveTo(d.x, d.y + s * .8, d.x + s * .5, d.y + s * .6, d.x + s * .5, d.y + s * .3); sctx.bezierCurveTo(d.x + s * .5, d.y, d.x, d.y, d.x, d.y + s * .3); }
+      else { sctx.moveTo(d.x, d.y - s); sctx.lineTo(d.x + s * .28, d.y - s * .28); sctx.lineTo(d.x + s, d.y); sctx.lineTo(d.x + s * .28, d.y + s * .28); sctx.lineTo(d.x, d.y + s); sctx.lineTo(d.x - s * .28, d.y + s * .28); sctx.lineTo(d.x - s, d.y); sctx.lineTo(d.x - s * .28, d.y - s * .28); }
+      sctx.fill();
     }
-    fctx.globalCompositeOperation = 'source-over';
+    sctx.globalAlpha = 1; sctx.globalCompositeOperation = 'source-over';
+  }
+  function show(count = 8, gap = 300) { // 一轮烟花秀
+    for (let i = 0; i < count; i++) setTimeout(() => launch(undefined, undefined, i === count - 1 ? 'heart' : undefined), i * gap + rand(0, 120));
   }
   let lastDust = 0;
   addEventListener('pointermove', (e) => {
@@ -685,7 +980,7 @@ const CHATS = [
     dust.push({ x: e.clientX, y: e.clientY, vx: rand(-.6, .6), vy: rand(-.8, .2), life: 1, s: rand(3, 6), hue: Math.random() < .5 ? 335 : 210 });
   }, { passive: true });
   document.addEventListener('click', (e) => {
-    if (!ready() || e.target.closest('.polaroid,.lb,button,#heartStage')) return;
+    if (!ready() || e.target.closest('.polaroid,.lb,button,#heartStage,.chat')) return;
     burstAt(e.clientX, e.clientY);
   });
 
@@ -738,10 +1033,10 @@ const CHATS = [
     intro.classList.add('out');
     document.body.classList.remove('intro-on'); document.body.classList.add('ready');
     if (bgmOK) musicBtn.hidden = false;
-    explode(W / 2, H * .44, 340, true);
-    setTimeout(() => { launch(W * .25, H * .25); launch(W * .75, H * .3, true); }, 500);
+    shell(W / 2, H * .44, 'heart');
+    setTimeout(() => { launch(W * .25, H * .25, 'peony'); launch(W * .75, H * .3, 'chrys'); }, 500);
     setTimeout(() => intro.remove(), 1600);
-    document.querySelectorAll('.rv,.polaroid,.snip').forEach((el) => { io.unobserve(el); io.observe(el); });
+    document.querySelectorAll('.rv,.polaroid').forEach((el) => { io.unobserve(el); io.observe(el); });
   }
   intro.addEventListener('click', enter);
   addEventListener('keydown', (e) => { if (!entering && (e.key === 'Enter' || e.key === ' ')) enter(); });
@@ -781,7 +1076,7 @@ const CHATS = [
     $('#cdDate').innerHTML = `${a.date.getFullYear()}.${pad(a.date.getMonth() + 1)}.${pad(a.date.getDate())} · 第 <em>${a.n}</em> 个十月二十七`;
     if (a.isToday) {
       $('#cdLabel').textContent = '就是今天'; $('#cdDays').textContent = '♥'; $('#cdUnit').textContent = '周年快乐'; $('#cdTick').textContent = ''; frac = 1;
-      if (!celebrated && ready()) { celebrated = true; for (let i = 0; i < 6; i++) setTimeout(() => launch(), i * 500); }
+      if (!celebrated && ready()) { celebrated = true; show(10, 450); }
     } else {
       const ms = a.date - Date.now(), d = Math.floor(ms / 864e5), rest = Math.floor((ms % 864e5) / 1000);
       $('#cdLabel').textContent = '还有'; $('#cdDays').textContent = d; $('#cdUnit').textContent = '天';
@@ -795,9 +1090,9 @@ const CHATS = [
   }
 
   /* =================================================================
-     聊天记录：滚动到哪段，就一条条“发”出来
+     聊天记录：固定高度的面板，往下滑一段段“发”出来；电脑上也可以用鼠标拖动
      ================================================================= */
-  const chatBody = $('#chatBody');
+  const chatBody = $('#chatBody'), chatScroll = $('#chatScroll'), chatHint = $('#chatHint'), chatNow = $('#chatNow');
   function avatar(who) {
     const d = document.createElement('div'); d.className = 'av';
     const src = who === 'h' ? AVATAR_HER : AVATAR_ME;
@@ -805,6 +1100,7 @@ const CHATS = [
     return d;
   }
   if (AVATAR_HER) { $('#headAv').textContent = ''; $('#headAv').appendChild(Object.assign(new Image(), { src: AVATAR_HER, alt: '' })); }
+  $('#chatCount').textContent = CHATS.length;
   CHATS.forEach((c) => {
     const s = document.createElement('div'); s.className = 'snip';
     const d = document.createElement('span'); d.className = 'snip-date'; d.textContent = c.date; s.appendChild(d);
@@ -812,30 +1108,63 @@ const CHATS = [
       const m = document.createElement('div'); m.className = 'msg' + (who === 'm' ? ' me' : '');
       const b = document.createElement('div'); b.className = 'bub'; b.dataset.text = text; m.append(avatar(who), b); s.appendChild(m);
     });
-    s._fx = c.fx;
+    s._fx = c.fx; s._date = c.date.replace(/\s.*$/, '');
     chatBody.appendChild(s);
   });
   function playSnip(s) {
     const msgs = [...s.querySelectorAll('.msg')]; let t = 0;
     msgs.forEach((m, i) => {
       const b = m.querySelector('.bub'), text = b.dataset.text, her = !m.classList.contains('me');
-      const typingMs = her ? Math.min(900, 260 + text.length * 22) : 0;
+      const typingMs = her ? Math.min(650, 200 + text.length * 14) : 0;
       setTimeout(() => {
         if (her) b.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>', b.style.padding = '0';
         m.classList.add('on');
         setTimeout(() => {
           b.style.padding = ''; b.textContent = text;
-          if (i === msgs.length - 1 && s._fx) triggerFx(s._fx, m);
+          if (i === msgs.length - 1 && s._fx) triggerFx(s._fx);
         }, typingMs);
       }, t);
-      t += typingMs + 420;
+      t += typingMs + 320;
     });
   }
-  function triggerFx(kind, el) {
-    if (kind === 'fireworks') { for (let i = 0; i < 8; i++) setTimeout(() => launch(undefined, undefined, i % 3 === 0), i * 260); }
+  function triggerFx(kind) {
+    if (kind === 'fireworks') show(10, 260);
     else if (kind === 'stars') starRain(46);
     else if (kind === 'hearts') heartRain();
   }
+  const chatIO = new IntersectionObserver((es) => es.forEach((e) => {
+    if (!e.isIntersecting) return; playSnip(e.target); chatIO.unobserve(e.target);
+  }), { root: chatScroll, threshold: 0, rootMargin: '0px 0px -10% 0px' });
+  let chatStarted = false;
+  function startChat() { if (chatStarted) return; chatStarted = true; chatBody.querySelectorAll('.snip').forEach((el) => chatIO.observe(el)); }
+  let chatTick = false;
+  chatScroll.addEventListener('scroll', () => {
+    if (chatScroll.scrollTop > 40) chatHint.classList.add('hide');
+    if (chatTick) return; chatTick = true;
+    requestAnimationFrame(() => {
+      chatTick = false;
+      const top = chatScroll.scrollTop + 30;
+      const cur = [...chatBody.children].find((el) => el.offsetTop + el.offsetHeight > top);
+      if (cur) chatNow.textContent = cur._date;
+    });
+  }, { passive: true });
+  // 电脑上用鼠标按住拖动（带惯性）
+  let cd = null, cv = 0, craf = 0;
+  chatScroll.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    cd = { y: e.clientY, top: chatScroll.scrollTop, ly: e.clientY, t: performance.now() }; cv = 0; cancelAnimationFrame(craf);
+  });
+  addEventListener('pointermove', (e) => {
+    if (!cd) return;
+    if (Math.abs(e.clientY - cd.y) > 4) chatScroll.classList.add('grabbing');
+    chatScroll.scrollTop = cd.top - (e.clientY - cd.y);
+    const now = performance.now(); cv = (cd.ly - e.clientY) / Math.max(1, now - cd.t) * 16; cd.ly = e.clientY; cd.t = now;
+  });
+  addEventListener('pointerup', () => {
+    if (!cd) return; cd = null; chatScroll.classList.remove('grabbing');
+    const glide = () => { if (Math.abs(cv) < .5) return; chatScroll.scrollTop += cv; cv *= .94; craf = requestAnimationFrame(glide); };
+    glide();
+  });
 
   /* =================================================================
      照片墙 & 灯箱
@@ -904,20 +1233,20 @@ const CHATS = [
     else if (el.classList.contains('snip')) playSnip(el);
     else el.classList.add('in');
     if (el.classList.contains('ring')) { ringShown = true; tickCountdown(); }
-    if (el.id === 'endTitle') { for (let i = 0; i < 7; i++) setTimeout(() => launch(), 300 + i * 650); }
+    if (el.id === 'endTitle') show(9, 520);
+    if (el.classList.contains('chat')) startChat();
     io.unobserve(el);
   }), { threshold: 0, rootMargin: '0px 0px -12% 0px' });
   document.querySelectorAll('.rv').forEach((el) => io.observe(el));
-  chatBody.querySelectorAll('.snip').forEach((el) => io.observe(el));
   new IntersectionObserver((es) => es.forEach((e) => (heartVisible = e.isIntersecting))).observe(stage);
 
-  $('#boom').addEventListener('click', () => { for (let i = 0; i < 10; i++) setTimeout(() => launch(undefined, undefined, i % 3 === 0), i * 220); });
+  $('#boom').addEventListener('click', () => show(14, 200));
   $('#endTitle').textContent = `第${cn(fullYears() + 1)}年，还是你。`;
 
   /* =================================================================
      启动
      ================================================================= */
-  function initAll() { W = innerWidth; H = innerHeight; initBg(); initPetals(); initHeart(); fctx = fit(fx, W, H); }
+  function initAll() { W = innerWidth; H = innerHeight; initBg(); initPetals(); initHeart(); fctx = fit(fx, W, H); sctx = fit(scv, W, H); }
   let lastW = W, rt;
   addEventListener('resize', () => {
     clearTimeout(rt);
@@ -933,7 +1262,7 @@ const CHATS = [
   function loop(t) {
     requestAnimationFrame(loop);
     if (document.hidden) return;
-    drawBg(t); drawPetals();
+    drawBg(t); drawPetals(); drawDust();
     if (intro.isConnected) drawIntro(t);
     drawHeart(t); drawFx();
   }
