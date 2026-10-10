@@ -1,118 +1,486 @@
-<!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-	<title>Our Love Story</title>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<style type="text/css">
-		@font-face {
-			font-family: digit;
-			src: url('digital-7_mono.ttf') format("truetype");
-		}
-	</style>
-	<link href="css/default.css" type="text/css" rel="stylesheet">
-	<script type="text/javascript" src="js/jquery.js"></script>
-	<script type="text/javascript" src="js/garden.js"></script>
-    <script type="text/javascript" src="js/functions.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07020d">
+<title>Our Love Story · 刘俐君</title>
+<!-- 非阻塞加载字体：国内打不开也不会卡住页面 -->
+<link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  @font-face { font-family: digit; src: url('digital-7_mono.ttf') format('truetype'); font-display: swap; }
+
+  :root{
+    --bg:#07020d; --pink:#ff4d8d; --rose:#ff9cc0; --violet:#9b5cff; --gold:#ffd27a;
+    --glass:rgba(255,255,255,.06); --line:rgba(255,255,255,.12); --text:#f6e9f2; --muted:#b8a3b8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg);color:var(--text);overflow-x:hidden}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+    background:
+      radial-gradient(1200px 800px at 80% -10%, rgba(155,92,255,.18), transparent 60%),
+      radial-gradient(900px 700px at -10% 40%, rgba(255,77,141,.14), transparent 60%),
+      radial-gradient(800px 600px at 60% 110%, rgba(255,77,141,.12), transparent 60%),
+      var(--bg);
+    min-height:100vh;
+  }
+  canvas.layer{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+  #bg{z-index:0} #fx{z-index:50}
+  main{position:relative;z-index:1}
+  section{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 16px;position:relative}
+
+  /* ---------- 开场 ---------- */
+  #intro{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;
+    background:radial-gradient(circle at 50% 50%, #1a0618 0%, #07020d 70%);cursor:pointer;transition:opacity 1.2s ease, visibility 1.2s}
+  #intro.hide{opacity:0;visibility:hidden}
+  .beat{width:90px;height:90px;filter:drop-shadow(0 0 24px var(--pink));animation:beat 1.1s infinite}
+  .beat path{fill:url(#hg)}
+  @keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.18)}24%{transform:scale(1)}36%{transform:scale(1.12)}}
+  #intro h1{font-family:"Great Vibes","Brush Script MT",cursive;font-weight:400;font-size:clamp(34px,9vw,64px);
+    background:linear-gradient(90deg,var(--rose),#fff,var(--rose));-webkit-background-clip:text;background-clip:text;color:transparent;
+    background-size:200% 100%;animation:shine 4s linear infinite}
+  #intro p{color:var(--muted);letter-spacing:.4em;font-size:13px;animation:blink 2s infinite}
+  @keyframes shine{to{background-position:-200% 0}}
+  @keyframes blink{50%{opacity:.35}}
+
+  /* ---------- Hero 爱心 ---------- */
+  .eyebrow{letter-spacing:.5em;font-size:12px;color:var(--rose);opacity:.8;text-transform:uppercase;margin-bottom:8px}
+  .heart-wrap{position:relative;width:var(--hs);height:calc(var(--hs) * .92);touch-action:pan-y}
+  #heart{width:100%;height:100%;display:block}
+  .heart-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:6%;pointer-events:none;text-align:center}
+  .heart-text .name{font-size:clamp(30px,9vw,58px);font-weight:700;letter-spacing:.12em;
+    background:linear-gradient(180deg,#fff 20%,var(--rose));-webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 30px rgba(255,77,141,.35);opacity:0;transform:scale(.8);transition:all 1.6s cubic-bezier(.2,.8,.2,1) 1.4s}
+  .heart-text .sub{margin-top:8px;font-size:clamp(11px,3.2vw,15px);color:#ffd6e6;opacity:0;transition:opacity 1.4s ease 2.4s;max-width:70%}
+  body.started .heart-text .name{opacity:1;transform:none}
+  body.started .heart-text .sub{opacity:.9}
+
+  .clock{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(8px,2.5vw,16px);margin-top:18px;width:min(560px,100%)}
+  .unit{background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:14px 4px 10px;text-align:center;
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08)}
+  .unit b{display:block;font-family:digit,"JetBrains Mono",monospace;font-weight:400;font-size:clamp(26px,8.5vw,52px);line-height:1;
+    color:#fff;text-shadow:0 0 12px var(--pink),0 0 28px rgba(255,77,141,.6);transition:transform .25s}
+  .unit b.pop{transform:scale(1.12)}
+  .unit span{display:block;margin-top:6px;font-size:clamp(10px,2.8vw,12px);color:var(--muted);letter-spacing:.2em}
+  .since{margin-top:16px;font-size:13px;color:var(--muted);text-align:center;line-height:1.8}
+  .since em{font-style:normal;color:var(--gold)}
+  .scroll-hint{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);color:var(--muted);font-size:11px;letter-spacing:.3em;
+    display:flex;flex-direction:column;align-items:center;gap:6px;opacity:.7}
+  .scroll-hint i{width:1px;height:28px;background:linear-gradient(var(--rose),transparent);animation:drop 1.8s infinite}
+  @keyframes drop{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+  /* ---------- 代码 ---------- */
+  .term{width:min(640px,100%);border-radius:16px;overflow:hidden;background:rgba(14,8,22,.75);border:1px solid var(--line);
+    box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 1px rgba(255,77,141,.08),0 0 60px rgba(155,92,255,.15);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  .term-bar{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.03)}
+  .term-bar i{width:11px;height:11px;border-radius:50%;display:block}
+  .term-bar i:nth-child(1){background:#ff5f57}.term-bar i:nth-child(2){background:#febc2e}.term-bar i:nth-child(3){background:#28c840}
+  .term-bar span{margin-left:auto;margin-right:auto;font-size:12px;color:var(--muted);font-family:"JetBrains Mono",Consolas,monospace;transform:translateX(-20px)}
+  #code{padding:18px 18px 22px;min-height:22em;font-family:"JetBrains Mono",Consolas,Menlo,monospace;font-size:clamp(11px,3.1vw,14px);line-height:1.75;
+    white-space:pre-wrap;word-break:break-word;color:#e9dff0}
+  #code .c{color:#7d8c99;font-style:italic}#code .k{color:#ff79c6;font-weight:600}#code .s{color:#f1fa8c}
+  #code .t{color:#8be9fd}#code .f{color:#50fa7b}
+  .caret{display:inline-block;width:.55em;height:1.1em;background:var(--pink);vertical-align:-2px;margin-left:1px;animation:blink 1s steps(1) infinite;box-shadow:0 0 8px var(--pink)}
+
+  /* ---------- 3D 旋转木马 ---------- */
+  .title{font-family:"Great Vibes","Brush Script MT",cursive;font-weight:400;font-size:clamp(34px,9vw,60px);color:#fff;text-shadow:0 0 20px rgba(255,77,141,.6);text-align:center}
+  .hint{color:var(--muted);font-size:12px;letter-spacing:.25em;margin-top:6px}
+  .stage{position:relative;width:100%;height:var(--stageH,520px);display:flex;align-items:center;justify-content:center;perspective:1000px;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
+  .stage:active{cursor:grabbing}
+  #drag,#spin{position:relative;transform-style:preserve-3d}
+  #spin{width:var(--cw);height:var(--ch)}
+  .card{position:absolute;inset:0;border-radius:12px;transform-style:preserve-3d;
+    box-shadow:0 0 10px rgba(255,255,255,.6),0 0 30px rgba(255,77,141,.35);
+    -webkit-box-reflect:below 10px linear-gradient(transparent,transparent 55%,rgba(0,0,0,.35));transition:box-shadow .3s}
+  .card:hover{box-shadow:0 0 16px #fff,0 0 40px rgba(255,77,141,.7)}
+  .card img,.card video{width:100%;height:100%;object-fit:cover;border-radius:12px;display:block;pointer-events:none;-webkit-user-drag:none;background:#1a0b1c}
+  #ground{position:absolute;top:100%;left:50%;width:var(--gs);height:var(--gs);transform:translate(-50%,-50%) rotateX(90deg);
+    background:radial-gradient(closest-side,rgba(255,77,141,.35),rgba(155,92,255,.12) 60%,transparent);pointer-events:none}
+  .floor-name{position:absolute;top:100%;left:50%;transform:translate(-50%,-50%) rotateX(90deg);white-space:nowrap;
+    font-size:clamp(18px,5vw,28px);font-weight:700;letter-spacing:.3em;color:#fff;text-shadow:0 0 14px var(--pink);pointer-events:none}
+
+  /* ---------- 结尾 ---------- */
+  .finale{text-align:center}
+  .finale h2{font-family:"Great Vibes","Brush Script MT",cursive;font-weight:400;font-size:clamp(40px,12vw,84px);line-height:1.1;
+    background:linear-gradient(90deg,var(--rose),#fff,var(--gold),#fff,var(--rose));background-size:300% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
+  .finale .sig{margin-top:18px;font-family:"Great Vibes","Brush Script MT",cursive;font-size:clamp(26px,7vw,40px);color:var(--rose)}
+  .finale button{margin-top:36px;padding:12px 28px;border-radius:999px;border:1px solid rgba(255,156,192,.5);background:rgba(255,77,141,.12);
+    color:#fff;font-size:14px;letter-spacing:.2em;cursor:pointer;backdrop-filter:blur(6px);box-shadow:0 0 24px rgba(255,77,141,.25);transition:.3s}
+  .finale button:hover{background:rgba(255,77,141,.3);box-shadow:0 0 40px rgba(255,77,141,.5)}
+
+  /* ---------- 灯箱 ---------- */
+  #lightbox{position:fixed;inset:0;z-index:90;background:rgba(5,1,10,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:.35s}
+  #lightbox.open{opacity:1;visibility:visible}
+  #lightbox img,#lightbox video{max-width:100%;max-height:86svh;border-radius:14px;box-shadow:0 0 60px rgba(255,77,141,.35);transform:scale(.92);transition:transform .35s}
+  #lightbox.open img,#lightbox.open video{transform:none}
+  #lightbox .x{position:absolute;top:calc(14px + env(safe-area-inset-top));right:16px;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);
+    background:var(--glass);color:#fff;font-size:20px;cursor:pointer}
+
+  .reveal{opacity:0;transform:translateY(40px);transition:opacity 1.1s ease,transform 1.1s cubic-bezier(.2,.8,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+</style>
 </head>
+<body>
 
-<!-- 3D旋转木马 -->
-<div id="drag-container">
-  <div id="spin-container">
+<canvas id="bg" class="layer"></canvas>
+<canvas id="fx" class="layer"></canvas>
 
-    <img src="img/pexels-photo-206395.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="">
-    <img src="img/pexels-photo-1391498.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="">
-    <img src="img/pexels-photo-1382731.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="">
-    <img src="img/pexels-photo-1758144.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="">
-    <img src="img/pexels-photo-1382734.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="">
-    <img src="img/pexels-photo-1462636.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="">
-
-
-    <a target="_blank" href="img/pexels-photo-139829.jpg">
-      <img src="img/pexels-photo-139829.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="">
-    </a>
-
-    <video controls="controls" loop>
-      <source src="mp4/1593439035493890.mp4" type="video/mp4">
-    </video>
-
-    <!-- Dòng chữ ở giữa vòng xoay -->
-    <p>刘除夕</p>
-  </div>
-  <div id="ground"></div>
+<!-- 开场 -->
+<div id="intro">
+  <svg class="beat" viewBox="0 0 32 29">
+    <defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff9cc0"/><stop offset="1" stop-color="#ff2d6f"/></linearGradient></defs>
+    <path d="M16 29 C16 29 0 19 0 8.5 C0 3.5 4 0 8.5 0 C11.6 0 14.4 1.8 16 4.5 C17.6 1.8 20.4 0 23.5 0 C28 0 32 3.5 32 8.5 C32 19 16 29 16 29Z"/>
+  </svg>
+  <h1>For 刘俐君</h1>
+  <p>轻 触 开 启</p>
 </div>
 
-<body>
-	<div id="mainDiv">
-		<div id="content">
-			<div id="code">
-				<span class="comments">/**</span><br />
-				<span class="space"/><span class="comments">* Another ordinary day, A day of paddling,</span><br />
-				<span class="space"/><span class="comments">* so I write some code to show your beauty.</span><br />
-				<span class="space"/><span class="comments">*/</span><br />
-				Boy i = <span class="keyword">new</span> Boy(<span class="string">"Huanglei"</span>);<br />
-				Girl u = <span class="keyword">new</span> Girl(<span class="string">"Liulijun"</span>);<br />
-				<span class="comments">// Oct 27, 2019, You bring me hair ties. </span><br />
-				i.love(u);<br />
-				<span class="comments">// Luckily, you accepted and became my girlfriend eversince.</span><br />
-				u.accepted();<br />
-				<span class="comments">// Since then, I miss u every day.</span><br />
-				i.miss(u);<br />
-				<span class="comments">// And take care of u and our love.</span><br />
-				i.takeCareOf(u);<br />
- 				<span class="comments">// You say that you want something make you happy.</span><br />
-				<span class="comments">// So here are some pictures and video.</span><br />
-				i.alwaysHappilyWith(u);<br />
-			</div>
-			<div id="loveHeart">
-				<canvas id="garden"></canvas>
-				<div id="words">
-					<div id="messages">
-						刘俐君, I have fallen in love with you for
-						<div id="elapseClock"></div>
-					</div>
-					<div id="loveu">
-						Love u forever and ever.<br/>
-						<div class="signature">- lei</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<script type="text/javascript">
-		var offsetX = $("#loveHeart").width() / 2;
-		var offsetY = $("#loveHeart").height() / 2 - 55;
-		var together = new Date();
-		// 如果要写10月 写个9 --从0计数
-		together.setFullYear(2019, 9, 27);
-		together.setHours(19);
-		together.setMinutes(0);
-		together.setSeconds(0);
-		together.setMilliseconds(0);
+<main>
+  <!-- 爱心 + 计时 -->
+  <section id="hero">
+    <div class="eyebrow">Our Love Story</div>
+    <div class="heart-wrap" id="heartWrap">
+      <canvas id="heart"></canvas>
+      <div class="heart-text">
+        <div class="name">刘俐君</div>
+        <div class="sub">I have fallen in love with you for</div>
+      </div>
+    </div>
+    <div class="clock reveal">
+      <div class="unit"><b id="d">0</b><span>DAYS</span></div>
+      <div class="unit"><b id="h">00</b><span>HOURS</span></div>
+      <div class="unit"><b id="m">00</b><span>MINUTES</span></div>
+      <div class="unit"><b id="s">00</b><span>SECONDS</span></div>
+    </div>
+    <div class="since reveal">since <em>2019.10.27 19:00</em><br><span id="anniv"></span></div>
+    <div class="scroll-hint">SCROLL<i></i></div>
+  </section>
 
-		if (!document.createElement('canvas').getContext) {
-			var msg = document.createElement("div");
-			msg.id = "errorMsg";
-			msg.innerHTML = "Your browser doesn't support HTML5!<br/>Recommend use Chrome 14+/IE 9+/Firefox 7+/Safari 4+"; 
-			document.body.appendChild(msg);
-			$("#code").css("display", "none")
-// 			$("#copyright").css("position", "absolute");
-// 			$("#copyright").css("bottom", "10px");
-		    document.execCommand("stop");
-		} else {
-			setTimeout(function () {
-				startHeartAnimation();
-			}, 5000);
+  <!-- 代码 -->
+  <section id="story">
+    <div class="term reveal">
+      <div class="term-bar"><i></i><i></i><i></i><span>LoveStory.java</span></div>
+      <div id="code"></div>
+    </div>
+  </section>
 
-			timeElapse(together);
-			setInterval(function () {
-				timeElapse(together);
-			}, 500);
+  <!-- 3D 相册 -->
+  <section id="gallery">
+    <div class="title reveal">Our Moments</div>
+    <div class="hint reveal">左右拖动旋转 · 点击查看大图</div>
+    <div class="stage" id="stage">
+      <div id="drag">
+        <div id="spin">
+          <div class="card"><img src="img/pexels-photo-206395.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""></div>
+          <div class="card"><img src="img/pexels-photo-1391498.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""></div>
+          <div class="card"><img src="img/pexels-photo-1382731.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""></div>
+          <div class="card"><img src="img/pexels-photo-1758144.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""></div>
+          <div class="card"><img src="img/pexels-photo-1382734.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""></div>
+          <div class="card"><img src="img/pexels-photo-1462636.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""></div>
+          <div class="card"><img src="img/pexels-photo-139829.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""></div>
+          <div class="card" data-video="mp4/1593439035493890.mp4">
+            <video src="mp4/1593439035493890.mp4" muted loop autoplay playsinline preload="metadata"></video>
+          </div>
+          <p class="floor-name">刘除夕</p>
+        </div>
+        <div id="ground"></div>
+      </div>
+    </div>
+  </section>
 
-			adjustCodePosition();
-			$("#code").typewriter();
-		}
-	</script>
-	<script type="text/javascript" src="js/script.js"></script>
+  <!-- 结尾 -->
+  <section id="end" class="finale">
+    <h2 class="reveal">Love u forever<br>and ever.</h2>
+    <div class="sig reveal">— lei</div>
+    <button class="reveal" id="again">♥ 再看一遍</button>
+  </section>
+</main>
+
+<div id="lightbox"><button class="x" aria-label="关闭">×</button><div id="lbInner"></div></div>
+
+<script>
+(() => {
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  const rand = (a, b) => Math.random() * (b - a) + a;
+  let W = innerWidth, H = innerHeight, started = false;
+
+  function fit(cv, w, h) {
+    cv.width = Math.round(w * DPR); cv.height = Math.round(h * DPR);
+    const ctx = cv.getContext('2d'); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); return ctx;
+  }
+  function heartShape(ctx, x, y, s) { // 小爱心，(x,y) 为中心
+    y -= s * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(x, y + s * 0.3);
+    ctx.bezierCurveTo(x, y, x - s * 0.5, y, x - s * 0.5, y + s * 0.3);
+    ctx.bezierCurveTo(x - s * 0.5, y + s * 0.6, x, y + s * 0.8, x, y + s);
+    ctx.bezierCurveTo(x, y + s * 0.8, x + s * 0.5, y + s * 0.6, x + s * 0.5, y + s * 0.3);
+    ctx.bezierCurveTo(x + s * 0.5, y, x, y, x, y + s * 0.3);
+    ctx.fill();
+  }
+
+  /* ================= 星空背景 ================= */
+  const bg = document.getElementById('bg'); let bctx;
+  let stars = [], floaters = [], meteor = null;
+  function initBg() {
+    bctx = fit(bg, W, H);
+    const n = Math.min(380, Math.floor(W * H / 3500));
+    stars = Array.from({ length: n }, () => ({ x: rand(0, W), y: rand(0, H), r: rand(.3, 1.4), p: rand(0, 6.28), s: rand(.6, 2) }));
+  }
+  function drawBg(t) {
+    bctx.clearRect(0, 0, W, H);
+    for (const st of stars) {
+      const a = .35 + .65 * Math.abs(Math.sin(st.p + t * .001 * st.s));
+      bctx.fillStyle = `rgba(255,235,245,${a})`;
+      bctx.beginPath(); bctx.arc(st.x, st.y, st.r, 0, 6.283); bctx.fill();
+    }
+    // 流星
+    if (!meteor && Math.random() < .004) meteor = { x: rand(W * .2, W), y: rand(-20, H * .3), l: 0 };
+    if (meteor) {
+      meteor.x -= 9; meteor.y += 4.5; meteor.l = Math.min(meteor.l + 12, 160);
+      const g = bctx.createLinearGradient(meteor.x, meteor.y, meteor.x + meteor.l, meteor.y - meteor.l / 2);
+      g.addColorStop(0, 'rgba(255,255,255,.9)'); g.addColorStop(1, 'rgba(255,156,192,0)');
+      bctx.strokeStyle = g; bctx.lineWidth = 1.6;
+      bctx.beginPath(); bctx.moveTo(meteor.x, meteor.y); bctx.lineTo(meteor.x + meteor.l, meteor.y - meteor.l / 2); bctx.stroke();
+      if (meteor.x < -200 || meteor.y > H + 200) meteor = null;
+    }
+    // 漂浮小爱心
+    if (floaters.length < (W < 600 ? 10 : 18) && Math.random() < .03)
+      floaters.push({ x: rand(0, W), y: H + 20, s: rand(6, 16), v: rand(.3, .9), ph: rand(0, 6), a: rand(.15, .45) });
+    for (let i = floaters.length - 1; i >= 0; i--) {
+      const f = floaters[i]; f.y -= f.v; f.ph += .02;
+      bctx.fillStyle = `rgba(255,77,141,${f.a * Math.min(1, f.y / (H * .4))})`;
+      heartShape(bctx, f.x + Math.sin(f.ph) * 14, f.y, f.s);
+      if (f.y < -30) floaters.splice(i, 1);
+    }
+  }
+
+  /* ================= 粒子爱心 ================= */
+  const heartCv = document.getElementById('heart'), heartWrap = document.getElementById('heartWrap');
+  let hctx, HS, HW, HH, scale, parts = [], pointer = { x: -999, y: -999 };
+  const sprites = ['255,77,141', '255,140,180', '255,220,235', '190,120,255'].map(c => {
+    const s = document.createElement('canvas'); s.width = s.height = 32;
+    const g = s.getContext('2d'), gr = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+    gr.addColorStop(0, `rgba(${c},1)`); gr.addColorStop(.25, `rgba(${c},.8)`); gr.addColorStop(1, `rgba(${c},0)`);
+    g.fillStyle = gr; g.fillRect(0, 0, 32, 32); return s;
+  });
+  const hp = t => [16 * Math.sin(t) ** 3, -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t))];
+
+  function initHeart() {
+    HS = Math.min(W - 24, 560);
+    document.documentElement.style.setProperty('--hs', HS + 'px');
+    HW = HS; HH = HS * .92; hctx = fit(heartCv, HW, HH);
+    scale = HS / 37;
+    const n = W < 600 ? 900 : 1500;
+    const old = parts; parts = [];
+    for (let i = 0; i < n; i++) {
+      const t = rand(0, Math.PI * 2); let [x, y] = hp(t);
+      const edge = Math.random() < .62;
+      const r = edge ? 1 + rand(-.035, .035) : Math.sqrt(Math.random()) * .93;
+      const p = old[i] || { x: rand(0, HW), y: rand(0, HH), vx: 0, vy: 0 };
+      p.tx = x * r; p.ty = (y + 2.5) * r;
+      p.sz = edge ? rand(5, 11) : rand(3, 8);
+      p.sp = sprites[Math.random() < .08 ? 3 : Math.random() < .55 ? 0 : Math.random() < .7 ? 1 : 2];
+      p.a = edge ? rand(.6, 1) : rand(.25, .7);
+      p.k = rand(.012, .03); p.wob = rand(0, 6.28);
+      parts.push(p);
+    }
+  }
+  function beat(t) { // 心跳曲线：咚-咚
+    const p = (t / 1000 % 1.15) / 1.15;
+    return 1 + .07 * Math.exp(-(((p - .06) / .05) ** 2)) + .045 * Math.exp(-(((p - .26) / .05) ** 2));
+  }
+  function drawHeart(t) {
+    hctx.clearRect(0, 0, HW, HH);
+    hctx.globalCompositeOperation = 'lighter';
+    const b = beat(t), cx = HW / 2, cy = HH / 2;
+    for (const p of parts) {
+      let tx, ty;
+      if (started) {
+        tx = cx + p.tx * scale * b + Math.sin(t * .002 + p.wob) * 1.2;
+        ty = cy + p.ty * scale * b + Math.cos(t * .0017 + p.wob) * 1.2;
+      } else {
+        tx = p.x + Math.sin(t * .0005 + p.wob) * .6; ty = p.y + Math.cos(t * .0004 + p.wob) * .6;
+      }
+      p.vx += (tx - p.x) * p.k; p.vy += (ty - p.y) * p.k;
+      const dx = p.x - pointer.x, dy = p.y - pointer.y, d2 = dx * dx + dy * dy;
+      if (d2 < 3600) { const f = (3600 - d2) / 3600 * 2.2; const d = Math.sqrt(d2) || 1; p.vx += dx / d * f; p.vy += dy / d * f; }
+      p.vx *= .86; p.vy *= .86; p.x += p.vx; p.y += p.vy;
+      hctx.globalAlpha = p.a;
+      hctx.drawImage(p.sp, p.x - p.sz / 2, p.y - p.sz / 2, p.sz, p.sz);
+    }
+    hctx.globalAlpha = 1; hctx.globalCompositeOperation = 'source-over';
+  }
+  heartWrap.addEventListener('pointermove', e => { const r = heartCv.getBoundingClientRect(); pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top; });
+  heartWrap.addEventListener('pointerleave', () => { pointer.x = pointer.y = -999; });
+  heartWrap.addEventListener('pointerup', () => { if (pointer.x > -999) setTimeout(() => { pointer.x = pointer.y = -999; }, 300); });
+
+  /* ================= 点击爆出爱心 ================= */
+  const fx = document.getElementById('fx'); let fctx, bursts = [];
+  function burst(x, y, n = 14) {
+    for (let i = 0; i < n; i++) {
+      const a = rand(0, Math.PI * 2), v = rand(2, 6);
+      bursts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2, s: rand(7, 15), life: 1, c: Math.random() < .5 ? '255,77,141' : '255,170,200' });
+    }
+  }
+  function drawFx() {
+    fctx.clearRect(0, 0, W, H);
+    for (let i = bursts.length - 1; i >= 0; i--) {
+      const b = bursts[i]; b.vy += .12; b.vx *= .98; b.x += b.vx; b.y += b.vy; b.life -= .018;
+      if (b.life <= 0) { bursts.splice(i, 1); continue; }
+      fctx.fillStyle = `rgba(${b.c},${b.life})`; heartShape(fctx, b.x, b.y, b.s * (.6 + b.life * .4));
+    }
+  }
+  document.addEventListener('click', e => {
+    if (e.target.closest('#stage, #lightbox, button')) return;
+    burst(e.clientX, e.clientY);
+  });
+
+  /* ================= 计时 ================= */
+  const together = new Date(2019, 9, 27, 19, 0, 0); // 月份从 0 计数，9 = 十月
+  const el = { d: d, h: h, m: m, s: s };
+  const pad = n => String(n).padStart(2, '0');
+  let last = {};
+  function setNum(k, v) { if (last[k] === v) return; last[k] = v; el[k].textContent = v; el[k].classList.add('pop'); setTimeout(() => el[k].classList.remove('pop'), 200); }
+  function tick() {
+    const now = new Date(); let sec = Math.max(0, Math.floor((now - together) / 1000));
+    setNum('d', String(Math.floor(sec / 86400))); sec %= 86400;
+    setNum('h', pad(Math.floor(sec / 3600))); sec %= 3600;
+    setNum('m', pad(Math.floor(sec / 60))); setNum('s', pad(sec % 60));
+    const y = now.getFullYear(); let ann = new Date(y, 9, 27);
+    const todayStart = new Date(y, now.getMonth(), now.getDate());
+    if (ann < todayStart) ann = new Date(y + 1, 9, 27);
+    const nth = ann.getFullYear() - 2019, left = Math.round((ann - todayStart) / 86400000);
+    anniv.innerHTML = left === 0 ? `今天是我们的第 <em>${nth}</em> 周年纪念日 ♥` : `距离第 <em>${nth}</em> 周年纪念日还有 <em>${left}</em> 天`;
+  }
+  tick(); setInterval(tick, 1000);
+
+  /* ================= 打字机代码 ================= */
+  const codeHTML =
+`<span class="c">/**
+ * Another ordinary day, a day of paddling,
+ * so I write some code to show your beauty.
+ */</span>
+<span class="t">Boy</span> i = <span class="k">new</span> <span class="t">Boy</span>(<span class="s">"Huanglei"</span>);
+<span class="t">Girl</span> u = <span class="k">new</span> <span class="t">Girl</span>(<span class="s">"Liulijun"</span>);
+<span class="c">// Oct 27, 2019, you bring me hair ties.</span>
+i.<span class="f">love</span>(u);
+<span class="c">// Luckily, you accepted and became my girlfriend ever since.</span>
+u.<span class="f">accepted</span>();
+<span class="c">// Since then, I miss u every day.</span>
+i.<span class="f">miss</span>(u);
+<span class="c">// And take care of u and our love.</span>
+i.<span class="f">takeCareOf</span>(u);
+<span class="c">// You say that you want something to make you happy.
+// So here are some pictures and video.</span>
+i.<span class="f">alwaysHappilyWith</span>(u);`;
+  const codeEl = document.getElementById('code'); let typed = false;
+  function typewrite() {
+    if (typed) return; typed = true; let i = 0;
+    const timer = setInterval(() => {
+      if (codeHTML[i] === '<') i = codeHTML.indexOf('>', i) + 1; else i++;
+      codeEl.innerHTML = codeHTML.slice(0, i) + '<span class="caret"></span>';
+      if (i >= codeHTML.length) clearInterval(timer);
+    }, 32);
+  }
+
+  /* ================= 滚动出现 ================= */
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in');
+    if (e.target.classList.contains('term') && started) typewrite();
+  }), { threshold: .2 });
+  document.querySelectorAll('.reveal').forEach(n => io.observe(n));
+
+  /* ================= 3D 旋转木马 ================= */
+  const stage = document.getElementById('stage'), spin = document.getElementById('spin'), drag = document.getElementById('drag');
+  const cards = [...spin.querySelectorAll('.card')];
+  let rotY = 0, tiltX = -10, velY = 0, velX = 0, dragging = false, autoSpeed = -0.12;
+  function layoutCarousel() {
+    const cw = Math.round(Math.max(80, Math.min(140, W * .22)));
+    const ch = Math.round(cw * 1.42);
+    const radius = Math.round(Math.max(cw * 1.45, Math.min(290, W * .32)));
+    const root = document.documentElement.style;
+    root.setProperty('--cw', cw + 'px'); root.setProperty('--ch', ch + 'px');
+    root.setProperty('--gs', radius * 3 + 'px'); root.setProperty('--stageH', Math.round(ch * 2.6 + 60) + 'px');
+    cards.forEach((c, i) => { c.style.transform = `rotateY(${i * 360 / cards.length}deg) translateZ(${radius}px)`; });
+  }
+  let down = null;
+  stage.addEventListener('pointerdown', e => {
+    down = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, card: e.target.closest('.card'), moved: false };
+    velY = velX = 0;
+  });
+  window.addEventListener('pointermove', e => {
+    if (!down) return;
+    const dx = e.clientX - down.lx, dy = e.clientY - down.ly;
+    if (!down.moved && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6) { down.moved = true; dragging = true; try { stage.setPointerCapture(e.pointerId); } catch (_) {} }
+    if (down.moved) { velY = dx * .25; velX = -dy * .12; rotY += velY; tiltX = Math.max(-28, Math.min(6, tiltX + velX)); }
+    down.lx = e.clientX; down.ly = e.clientY;
+  });
+  const up = () => { if (!down) return; if (!down.moved && down.card) openLB(down.card); down = null; dragging = false; };
+  window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+  function stepCarousel() {
+    if (!dragging) {
+      velY *= .95; velX *= .9; rotY += velY + (Math.abs(velY) < .5 ? autoSpeed : 0);
+      tiltX += (-10 - tiltX) * .02;
+    }
+    drag.style.transform = `rotateX(${tiltX}deg) rotateY(${rotY}deg)`;
+  }
+
+  /* ================= 灯箱 ================= */
+  const lb = document.getElementById('lightbox'), lbInner = document.getElementById('lbInner');
+  function openLB(card) {
+    lbInner.innerHTML = '';
+    if (card.dataset.video) {
+      const v = document.createElement('video');
+      v.src = card.dataset.video; v.controls = true; v.autoplay = true; v.playsInline = true; v.loop = true;
+      lbInner.appendChild(v);
+    } else {
+      const img = document.createElement('img'); img.src = card.querySelector('img').src.split('?')[0]; lbInner.appendChild(img);
+    }
+    lb.classList.add('open');
+  }
+  lb.addEventListener('click', e => { if (e.target === lb || e.target.classList.contains('x')) { lb.classList.remove('open'); setTimeout(() => lbInner.innerHTML = '', 350); } });
+
+  /* ================= 开场 / 重播 ================= */
+  document.getElementById('intro').addEventListener('click', e => {
+    e.stopPropagation();
+    if (started) return; started = true;
+    document.body.classList.add('started');
+    e.currentTarget.classList.add('hide');
+    burst(W / 2, H / 2, 30);
+    if (document.querySelector('.term.in')) typewrite();
+    document.querySelectorAll('.card video').forEach(v => v.play().catch(() => {}));
+  });
+  document.getElementById('again').addEventListener('click', e => {
+    burst(e.clientX, e.clientY, 24);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      parts.forEach(p => { p.vx = rand(-30, 30); p.vy = rand(-30, 30); });
+      typed = false; codeEl.innerHTML = '';
+    }, 700);
+  });
+
+  /* ================= 主循环 & 适配 ================= */
+  function initAll() {
+    W = innerWidth; H = innerHeight;
+    initBg(); fctx = fit(fx, W, H); initHeart(); layoutCarousel();
+  }
+  let rt, lastW = innerWidth;
+  addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+      if (innerWidth === lastW) { H = innerHeight; initBg(); fctx = fit(fx, W, H); return; } // 手机地址栏伸缩只改高度
+      lastW = innerWidth; initAll();
+    }, 200);
+  });
+  function loop(t) { drawBg(t); drawHeart(t); drawFx(); stepCarousel(); requestAnimationFrame(loop); }
+  initAll(); requestAnimationFrame(loop);
+})();
+</script>
 </body>
 </html>
